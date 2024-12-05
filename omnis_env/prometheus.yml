@@ -1,0 +1,26 @@
+.PHONY: init test lint format docker-build docker-run docker-compose-up docker-compose-down
+
+init:
+    python init_project.py
+
+test:
+    pytest tests/
+
+lint:
+    flake8 omnis/ scripts/ tests/
+
+format:
+    black omnis/ scripts/ tests/
+    isort omnis/ scripts/ tests/
+
+docker-build:
+    docker build -t omnis_app .
+
+docker-run:
+    docker run -p 8000:8000 omnis_app
+
+docker-compose-up:
+    docker-compose up --build
+
+docker-compose-down:
+    docker-compose down

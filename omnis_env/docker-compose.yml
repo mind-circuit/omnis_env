@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  omnis_app:
+    build: .
+    container_name: omnis_app
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    command: python scripts/main.py
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"    # RabbitMQ server
+      - "15672:15672"  # RabbitMQ management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  # Add database service if needed
+  # database:
+  #   image: postgres
+  #   container_name: postgres_db
+  #   environment:
+  #     POSTGRES_USER: ${DB_USER}
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
+  #     POSTGRES_DB: omnis_db
+  #   ports:
+  #     - "5432:5432"
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+volumes:
+  grafana-storage:
